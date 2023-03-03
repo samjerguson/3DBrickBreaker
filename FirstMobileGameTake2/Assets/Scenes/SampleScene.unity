@@ -491,9 +491,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ballPrefab: {fileID: 4149808223557299888, guid: 3e0e4596821b1a64db6ff0756fef4671,
     type: 3}
-  ballSpeed: 10
+  ballSpeed: 20
   defaultDistance: 10
   target: {fileID: 151202278}
   distance: 20
   height: 10
   speed: 10
+  swipeSensitivity: 1
+  swipeMagnitudeThreshold: 0.5
+  ballSpawnDistance: 0.5
