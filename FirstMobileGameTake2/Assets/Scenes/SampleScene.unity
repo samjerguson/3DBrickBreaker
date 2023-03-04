@@ -1290,6 +1290,7 @@ MonoBehaviour:
   swipeSensitivity: 1
   ballSpawnDistance: 0.5
   shootMode: 1
+  switchButton: {fileID: 212631059}
 --- !u!1 &1065848469
 GameObject:
   m_ObjectHideFlags: 0
