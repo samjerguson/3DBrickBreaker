@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class CameraBehavior : MonoBehaviour
 {
@@ -12,16 +13,32 @@ public class CameraBehavior : MonoBehaviour
     public float height; // height above the point
     public float speed; // speed of rotation around the point
     public float swipeSensitivity = 1f; // The sensitivity of the swipe
-    public float swipeMagnitudeThreshold = 20f; // The minimum magnitude of swipe required to move the camera
     public float ballSpawnDistance;
+    public bool shootMode;
+    public Button switchButton;
 
     private Vector2 fingerDownPosition;
     private Vector2 fingerUpPosition;
     private Vector3 ballInstPos;
-    Vector2 swipeDelta;
+    private Vector2 swipeDelta;
+    private int switchCount;
 
-    void LateUpdate()
+    void Start()
     {
+        switchCount = 0;
+        shootMode = false;
+        switchButton.onClick.AddListener(SwitchMode);
+    }
+    void Update()
+    {
+        if (Input.GetKeyDown("d"))
+        {
+            switchCount++;
+            if(switchCount%2 == 0) //alternate between cam mode and shoot mode for every d press, change this functionality to a button later
+                shootMode = false;
+            else
+                shootMode = true;   
+        }
         ballInstPos = transform.position + (transform.forward * ballSpawnDistance);
         if (Input.GetMouseButton(0)) // Check if the left mouse button is clicked
         {
@@ -34,7 +51,7 @@ public class CameraBehavior : MonoBehaviour
                 fingerUpPosition = Input.mousePosition;
                 Vector2 swipeDelta = (fingerUpPosition - fingerDownPosition) * swipeSensitivity;
 
-                if (swipeDelta.magnitude < swipeMagnitudeThreshold) // Check if the swipe is below the magnitude threshold
+                if (shootMode) // Check if the we are in shoot mode or cam mode
                 {
                     // Shoot the ball
                     Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Cast a ray from the camera towards the mouse position
@@ -61,9 +78,10 @@ public class CameraBehavior : MonoBehaviour
                 }
             }
         }
-        else // Apply the default camera rotation
+        if (Input.GetMouseButtonUp(0)) // Reset the finger positions when the user releases the finger
         {
-            //transform.RotateAround(target.position, Vector3.up, speed * Time.deltaTime);
+            fingerDownPosition = Vector2.zero;
+            fingerUpPosition = Vector2.zero;
         }
 
         // Update the camera position and look at the target position
@@ -72,12 +90,12 @@ public class CameraBehavior : MonoBehaviour
         transform.LookAt(targetPosition);
     }
 
-    void Update()
+    void SwitchMode()
     {
-        if (Input.GetMouseButtonUp(0)) // Reset the finger positions when the user releases the finger
-        {
-            fingerDownPosition = Vector2.zero;
-            fingerUpPosition = Vector2.zero;
-        }
+        switchCount++;
+        if(switchCount%2 == 0) //alternate between cam mode and shoot mode for every d press, change this functionality to a button later
+            shootMode = false;
+        else
+            shootMode = true;
     }
 }
