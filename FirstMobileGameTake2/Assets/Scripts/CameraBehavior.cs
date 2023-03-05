@@ -29,8 +29,10 @@ public class CameraBehavior : MonoBehaviour
         shootMode = false;
         switchButton.onClick.AddListener(SwitchMode);
     }
+
     void Update()
     {
+        print("yo");
         if (Input.GetKeyDown("d"))
         {
             switchCount++;
@@ -39,7 +41,6 @@ public class CameraBehavior : MonoBehaviour
             else
                 shootMode = true;   
         }
-        ballInstPos = transform.position + (transform.forward * ballSpawnDistance);
         if (Input.GetMouseButton(0)) // Check if the left mouse button is clicked
         {
             if (fingerDownPosition == Vector2.zero) // Store the finger down position only once
@@ -51,23 +52,7 @@ public class CameraBehavior : MonoBehaviour
                 fingerUpPosition = Input.mousePosition;
                 Vector2 swipeDelta = (fingerUpPosition - fingerDownPosition) * swipeSensitivity;
 
-                if (shootMode) // Check if the we are in shoot mode or cam mode
-                {
-                    // Shoot the ball
-                    Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Cast a ray from the camera towards the mouse position
-                    Vector3 target = ray.GetPoint(defaultDistance); // Get the default target point along the ray
-                    RaycastHit hit;
-                    if (Physics.Raycast(ray, out hit)) // Check if the ray hits something in the scene
-                    {
-                        target = hit.point; // Get the point where the ray hits the scene
-                    }
-                    Vector3 direction = (target - transform.position).normalized; // Get the direction from the camera to the target point
-
-                    GameObject ball = Instantiate(ballPrefab, ballInstPos, Quaternion.identity); // Instantiate the ball prefab at the camera position
-                    Rigidbody rb = ball.GetComponent<Rigidbody>();
-                    rb.velocity = direction * ballSpeed; // Shoot the ball in the direction of the target point with the given speed
-                }
-                else
+                if (!shootMode) // Check if the we are in shoot mode or cam mode
                 {
                     // Move the camera
                     transform.RotateAround(target.position, Vector3.up, swipeDelta.x * Time.deltaTime);
@@ -87,7 +72,30 @@ public class CameraBehavior : MonoBehaviour
         // Update the camera position and look at the target position
         Vector3 targetPosition = new Vector3(target.position.x, target.position.y + height, target.position.z);
         transform.position = targetPosition - transform.forward * distance;
-        transform.LookAt(targetPosition);
+        transform.LookAt(targetPosition);        
+    }
+    void FixedUpdate()
+    {
+        ballInstPos = transform.position + (transform.forward * ballSpawnDistance);
+        if (Input.GetMouseButton(0)) // Check if the left mouse button is clicked
+        {
+            if (shootMode) // Check if the we are in shoot mode or cam mode
+            {
+                // Shoot the ball
+                Ray ray = Camera.main.ScreenPointToRay(Input.mousePosition); // Cast a ray from the camera towards the mouse position
+                Vector3 target = ray.GetPoint(defaultDistance); // Get the default target point along the ray
+                RaycastHit hit;
+                if (Physics.Raycast(ray, out hit)) // Check if the ray hits something in the scene
+                {
+                    target = hit.point; // Get the point where the ray hits the scene
+                }
+                Vector3 direction = (target - transform.position).normalized; // Get the direction from the camera to the target point
+
+                GameObject ball = Instantiate(ballPrefab, ballInstPos, Quaternion.identity); // Instantiate the ball prefab at the camera position
+                Rigidbody rb = ball.GetComponent<Rigidbody>();
+                rb.velocity = direction * ballSpeed; // Shoot the ball in the direction of the target point with the given speed
+            }
+        }
     }
 
     void SwitchMode()
